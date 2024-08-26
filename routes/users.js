@@ -37,7 +37,8 @@ router.post("/logup", async (req, res) => {
             }
 
             // Création du token pour connexion immédiate
-            const token = jwt.sign({ userId: results.insertId }, JWT_SECRET, { expiresIn: '1h' });
+			const token = jwt.sign({ userId: results.insertId }, JWT_SECRET, { expiresIn: '1h' });
+
 
             res.status(201).json({ message: "Utilisateur créé avec succès", token });
         });
@@ -70,6 +71,7 @@ router.post("/login", async (req, res) => {
 			}
 
 			const user = results[0];
+
 			if (!user) {
 				return res.status(401).json({ err: err, message: "Nom incorrect" });
 			}
@@ -85,8 +87,9 @@ router.post("/login", async (req, res) => {
 						userPOINTuser_password: user.user_password,
 					});
 			}
-
-            const token = jwt.sign({userId: user.id}, JWT_SECRET, {expiresIn: '1h'});
+			
+			// Création du token
+            const token = jwt.sign({userId: user.user_id}, JWT_SECRET, {expiresIn: '1h'});
 
             return res.status(200).json({ token, message: "Connexion réussie", userName: user_name });
 		});
