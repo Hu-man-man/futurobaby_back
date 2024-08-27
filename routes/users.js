@@ -40,7 +40,7 @@ router.post("/logup", async (req, res) => {
 			const token = jwt.sign({ userId: results.insertId }, JWT_SECRET, { expiresIn: '1h' });
 
 
-            res.status(201).json({ message: "Utilisateur créé avec succès", token });
+            res.status(201).json({ message: "Utilisateur créé avec succès", token, userName: user_name });
         });
     } catch (error) {
         console.error(error);
