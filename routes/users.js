@@ -102,7 +102,7 @@
 // module.exports = router;
 
 var express = require("express");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const db = require("../db"); // Assurez-vous que ce module exporte un Pool ou Client pg
 
