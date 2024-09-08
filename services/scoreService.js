@@ -169,4 +169,4 @@ async function calculateScoresForAllUsers() {
 
 module.exports = {
 	calculateScoresForAllUsers,
-};
+}
