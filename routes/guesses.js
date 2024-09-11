@@ -127,18 +127,6 @@ router.get("/current", authenticateToken, async (req, res) => {
     }
 });
 
-// Déclancher manuellement le calcul des scores
-// // router.post("/calculate-scores", authenticateToken, async (req, res) => {
-// router.post("/calculate-scores", async (req, res) => {
-//     try {
-//         await calculateScoresForAllUsers();
-//         res.status(200).json({ message: "Les scores ont été calculés avec succès." });
-//     } catch (err) {
-//         console.error("Erreur lors du calcul des scores:", err);
-//         res.status(500).json({ error: "Erreur lors du calcul des scores" });
-//     }
-// });
-
 router.post("/calculate-scores", async (req, res) => {
     console.log("Début du calcul des scores...");
     console.time("Temps de calcul des scores");
