@@ -1,6 +1,6 @@
 
 const db = require("../db");
-const { getBabyInfo } = require("./babyService");
+const { getbabyInfo } = require("./babyService");
 
 // Fonction pour compter le nombre de lettres en commun entre deux prénoms
 function countCommonLetters(name1, name2) {
@@ -57,7 +57,7 @@ async function calculateScoresForAllUsers() {
             size: actual_size,
             name: actual_names,
             birthdate: actual_birthdate,
-        } = getBabyInfo();
+        } = getbabyInfo();
         console.log("Informations du bébé récupérées:", {
             actual_gender,
             actual_weight,
