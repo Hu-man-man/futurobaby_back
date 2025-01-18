@@ -33,7 +33,7 @@ function calculateNameScore(guessedName, actualName) {
 	const commonLetters = countCommonLetters(guessedName, actualName);
 
 	if (guessedName === actualName) {
-		return 5; // Prénom exact
+		return 7; // Prénom exact
 	} else if (commonLetters >= 4) {
 		return 2; // Au moins 4 lettres en commun
 	} else if (commonLetters >= 3) {
@@ -98,16 +98,16 @@ async function calculateScoresForAllUsers() {
 			const weightDiff = Math.abs(guess.guessed_weight - actual_weight);
 			if (weightDiff === 0) {
 				score_weight = 3;
-			} else if (weightDiff <= 0.1) {
+			} else if (weightDiff <= 0.101) {
 				score_weight = 1;
 			}
 			console.log("Différence de poids:", weightDiff, "Score:", score_weight);
 
 			// Calcul du score pour la taille
 			const sizeDiff = Math.abs(guess.guessed_size - actual_size);
-			if (sizeDiff === 0) {
-				score_size = 2;
-			} else if (sizeDiff <= 1) {
+			if (sizeDiff <= 1) {
+				score_size = 3;
+			} else if (sizeDiff <= 2.5) {
 				score_size = 1;
 			}
 			console.log("Différence de taille:", sizeDiff, "Score:", score_size);
@@ -144,7 +144,7 @@ async function calculateScoresForAllUsers() {
 				(1000 * 60 * 60 * 24);
 
 			if (dayDiff === 0) {
-				score_date = 2;
+				score_date = 3;
 			} else if (dayDiff === 1) {
 				score_date = 1;
 			}
@@ -164,14 +164,23 @@ async function calculateScoresForAllUsers() {
 			// const hourDiff = Math.abs(guessedHours - actualHours);
 			// const minuteDiff = Math.abs(guessedMinutes - actualMinutes);
 
-			// if (guessedHours === actualHours && guessedMinutes === actualMinutes) {
-			//     score_time = 5;
-			// } else if (guessedHours === actualHours && minuteDiff > 0) {
-			//     score_time = 3;
+			// if (guessedHours === actualHours && minuteDiff <= 3) {
+			//     score_time = 5; // Heure exacte et à moins de 3 minutes
+			// } else if (guessedHours === actualHours && minuteDiff > 3) {
+			//     score_time = 3; // Même heure mais plus de 3 minutes d'écart
 			// } else if (hourDiff === 1) {
-			//     score_time = 1;
+			//     score_time = 1; // À une heure près
 			// }
-			// console.log("Différence d'heures:", hourDiff, "Score pour l'heure:", score_time);
+			// console.log(
+			// 	"guessedHours:",
+			// 	guessedHours,
+			// 	"actualHours:",
+			// 	actualHours,
+			// 	"Différence d'heures:",
+			// 	hourDiff,
+			// 	"Score pour l'heure:",
+			// 	score_time
+			// );
 
 			// Comparaison de l'heure
 			const guessedHours = guessedBirthdate.getHours();
@@ -179,19 +188,23 @@ async function calculateScoresForAllUsers() {
 			const actualHours = actualBirthdate.getHours();
 			const actualMinutes = actualBirthdate.getMinutes();
 
-			const hourDiff = Math.abs(guessedHours - actualHours);
-			const minuteDiff = Math.abs(guessedMinutes - actualMinutes);
+			// Calculer la différence en minutes entre les heures et minutes devinées et réelles
+			const timeDiffMinutes = Math.abs(
+				guessedHours * 60 + guessedMinutes - (actualHours * 60 + actualMinutes)
+			);
 
-			if (guessedHours === actualHours && minuteDiff <= 3) {
-                score_time = 5; // Heure exacte et à moins de 3 minutes
-            } else if (guessedHours === actualHours && minuteDiff > 3) {
-                score_time = 3; // Même heure mais plus de 3 minutes d'écart
-            } else if (hourDiff === 1) {
-                score_time = 1; // À une heure près
-            }
+			if (timeDiffMinutes <= 2) {
+				score_time = 5; // Devine entre 18h56 et 19h00
+			} else if (timeDiffMinutes <= 60) {
+				score_time = 3; // Devine entre 17h58 et 19h58
+			} else if (timeDiffMinutes <= 120) {
+				score_time = 1; // Devine entre 16h58 et 20h58
+			} else {
+				score_time = 0; // En dehors de ces plages
+			}
 			console.log(
-				"Différence d'heures:",
-				hourDiff,
+				"Écart en minutes:",
+				timeDiffMinutes,
 				"Score pour l'heure:",
 				score_time
 			);

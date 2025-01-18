@@ -5,13 +5,19 @@ const { authenticateToken } = require("../services/authService"); // Assurez-vou
 
 const router = express.Router();
 
+
+
 // Route pour récupérer les informations du bébé
+
 router.get("/", (req, res) => {
 	const babyIsBorn = getbabyInfo();
 	res.json(babyIsBorn);
 });
 
+
+
 // Route pour récupérer les scores d'un utilisateur
+
 router.get("/scores", authenticateToken, async (req, res) => {
 	const user_id = req.user.userId;
 
@@ -43,26 +49,29 @@ router.get("/scores", authenticateToken, async (req, res) => {
 	}
 });
 
-// Route pour récupérer le classement général basé sur le total_score et afficher les user_name
-router.get("/rankings", async (req, res) => {
-	try {
-		const query = `
-        SELECT u.user_name, gs.total_score,
-        DENSE_RANK() OVER (ORDER BY gs.total_score DESC) AS rank
-        FROM guesses_scores gs
-        JOIN users u ON gs.user_id = u.user_id
-        ORDER BY gs.total_score DESC
-      `;
-		const result = await db.query(query);
 
-		res.status(200).json({ rankings: result.rows });
-	} catch (err) {
-		console.error("Erreur lors de la récupération du classement:", err);
-		res
-			.status(500)
-			.json({ error: "Erreur lors de la récupération du classement" });
-	}
+
+// Route pour récupérer le classement général basé sur le total_score et afficher les user_name
+
+router.get("/rankings", async (req, res) => {
+  try {
+    const query = `
+      SELECT u.user_id, u.user_name, gs.total_score,
+      DENSE_RANK() OVER (ORDER BY gs.total_score DESC) AS rank
+      FROM guesses_scores gs
+      JOIN users u ON gs.user_id = u.user_id
+      ORDER BY gs.total_score DESC
+    `;
+    const result = await db.query(query);
+
+    res.status(200).json({ rankings: result.rows });
+  } catch (err) {
+    console.error("Erreur lors de la récupération du classement:", err);
+    res.status(500).json({ error: "Erreur lors de la récupération du classement" });
+  }
 });
+
+
 // Route pour récupérer le classement d'un utilisateur spécifique (via token)
 router.get('/rankings/me', authenticateToken, async (req, res) => {
     const user_id = req.user.userId;

@@ -108,6 +108,40 @@ router.get("/current", authenticateToken, async (req, res) => {
     }
 });
 
+
+// Route pour récupérer les propositions publiques d'un utilisateur
+
+router.get("/current/public", async (req, res) => {
+    const { user_id } = req.query;
+
+    // Vérification de la validité de user_id
+    if (!user_id || isNaN(user_id)) {
+        return res.status(400).json({ error: "user_id est manquant ou invalide." });
+    }
+
+    try {
+        const query = `
+            SELECT g.guessed_gender, g.guessed_weight, g.guessed_size, g.guessed_names, g.guessed_birthdate
+            FROM guesses g
+            JOIN users_guesses ug ON g.guessed_id = ug.guessed_id
+            WHERE ug.user_id = $1
+        `;
+        const result = await db.query(query, [user_id]);
+
+        if (result.rows.length > 0) {
+            const guess = result.rows[0];
+            res.status(200).json({ guess });
+        } else {
+            res.status(404).json({ message: "Aucun guess trouvé pour cet utilisateur." });
+        }
+    } catch (err) {
+        console.error("Erreur lors de la récupération du guess:", err);
+        res.status(500).json({ error: "Erreur lors de la récupération du guess." });
+    }
+});
+
+
+
 router.post("/calculate-scores", async (req, res) => {
     console.log("Début du calcul des scores...");
     console.time("Temps de calcul des scores");

@@ -1,11 +1,11 @@
 function getbabyInfo() {
     // Données du bébé
     return {
-        gender: 'girl',        
-        weight: 3.9,           
-        size: 50,               
-        name: 'Maxime',         
-        birthdate: new Date('2024-10-26T12:00:00') 
+        gender: 'boy',        
+        weight: 3.5,           
+        size: 52.5,               
+        name: 'Marin',         
+        birthdate: new Date('2024-10-26T18:58:00') 
     };
 }
 
