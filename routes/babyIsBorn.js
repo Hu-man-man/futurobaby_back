@@ -18,11 +18,42 @@ router.get("/", (req, res) => {
 
 // Route pour récupérer les scores d'un utilisateur
 
-router.get("/scores", authenticateToken, async (req, res) => {
-	const user_id = req.user.userId;
+// router.get("/scores", authenticateToken, async (req, res) => {
+// 	const user_id = req.user.userId;
+
+// 	if (!user_id) {
+// 		return res.status(500).json({ error: "user_id est manquant ou invalide." });
+// 	}
+
+// 	try {
+// 		// Requête pour récupérer les scores de l'utilisateur
+// 		const query = `
+//       SELECT *
+//       FROM guesses_scores
+//       WHERE user_id = $1
+//     `;
+// 		const result = await db.query(query, [user_id]);
+
+// 		if (result.rows.length > 0) {
+// 			res.status(200).json({ scores: result.rows[0] });
+// 		} else {
+// 			res
+// 				.status(404)
+// 				.json({ message: "Aucun score trouvé pour cet utilisateur" });
+// 		}
+// 	} catch (err) {
+// 		console.error("Erreur lors de la récupération des scores:", err);
+// 		res
+// 			.status(500)
+// 			.json({ error: "Erreur lors de la récupération des scores" });
+// 	}
+// });
+
+router.get("/scores", async (req, res) => {
+	const { user_id } = req.query; // On récupère l'user_id depuis les paramètres de requête
 
 	if (!user_id) {
-		return res.status(500).json({ error: "user_id est manquant ou invalide." });
+		return res.status(400).json({ error: "user_id est manquant ou invalide." });
 	}
 
 	try {
@@ -37,17 +68,14 @@ router.get("/scores", authenticateToken, async (req, res) => {
 		if (result.rows.length > 0) {
 			res.status(200).json({ scores: result.rows[0] });
 		} else {
-			res
-				.status(404)
-				.json({ message: "Aucun score trouvé pour cet utilisateur" });
+			res.status(404).json({ message: "Aucun score trouvé pour cet utilisateur" });
 		}
 	} catch (err) {
 		console.error("Erreur lors de la récupération des scores:", err);
-		res
-			.status(500)
-			.json({ error: "Erreur lors de la récupération des scores" });
+		res.status(500).json({ error: "Erreur lors de la récupération des scores" });
 	}
 });
+
 
 
 
