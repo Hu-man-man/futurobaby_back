@@ -101,8 +101,36 @@ router.get("/rankings", async (req, res) => {
 
 
 // Route pour récupérer le classement d'un utilisateur spécifique (via token)
-router.get('/rankings/me', authenticateToken, async (req, res) => {
-    const user_id = req.user.userId;
+// router.get('/rankings/me', authenticateToken, async (req, res) => {
+//     const user_id = req.user.userId;
+  
+//     if (!user_id) {
+//       return res.status(500).json({ error: "user_id est manquant ou invalide." });
+//     }
+  
+//     try {
+//       const query = `
+//         SELECT user_id, total_score, rank FROM (
+//           SELECT user_id, total_score,
+//           DENSE_RANK() OVER (ORDER BY total_score DESC) AS rank
+//           FROM guesses_scores
+//         ) AS ranked_scores
+//         WHERE user_id = $1
+//       `;
+//       const result = await db.query(query, [user_id]);
+  
+//       if (result.rows.length > 0) {
+//         res.status(200).json({ rank: result.rows[0] });
+//       } else {
+//         res.status(404).json({ message: "Classement non trouvé pour cet utilisateur" });
+//       }
+//     } catch (err) {
+//       console.error("Erreur lors de la récupération du classement:", err);
+//       res.status(500).json({ error: "Erreur lors de la récupération du classement" });
+//     }
+//   });
+router.get('/rankings/me', async (req, res) => {
+  const { user_id } = req.query;
   
     if (!user_id) {
       return res.status(500).json({ error: "user_id est manquant ou invalide." });
@@ -129,6 +157,39 @@ router.get('/rankings/me', authenticateToken, async (req, res) => {
       res.status(500).json({ error: "Erreur lors de la récupération du classement" });
     }
   });
+
+  router.get('/rankings/user', async (req, res) => { 
+    const { user_id } = req.query;
+  
+    if (!user_id) {
+      return res.status(400).json({ error: "user_id est manquant ou invalide." });
+    }
+  
+    try {
+      const query = `
+        SELECT u.user_id, u.user_name, ranked_scores.total_score, ranked_scores.rank
+        FROM (
+          SELECT user_id, total_score,
+          DENSE_RANK() OVER (ORDER BY total_score DESC) AS rank
+          FROM guesses_scores
+        ) AS ranked_scores
+        INNER JOIN users u ON ranked_scores.user_id = u.user_id
+        WHERE u.user_id = $1
+      `;
+  
+      const result = await db.query(query, [user_id]);
+  
+      if (result.rows.length > 0) {
+        res.status(200).json(result.rows[0]); // Retourner directement les informations nécessaires
+      } else {
+        res.status(404).json({ message: "Classement non trouvé pour cet utilisateur." });
+      }
+    } catch (err) {
+      console.error("Erreur lors de la récupération du classement:", err);
+      res.status(500).json({ error: "Erreur lors de la récupération du classement." });
+    }
+  });
+  
   
 
 module.exports = router;
